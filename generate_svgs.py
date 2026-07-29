@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 """
 Premium GitHub Profile README Hero Banner - 3D Edition
-Pure SVG with SMIL animations, isometric 3D effects, no JavaScript
+Pure SVG with SMIL animations, isometric 3D effects, no JavaScript.
 """
 
-def get_theme(mode):
+from __future__ import annotations
+
+import argparse
+from html import escape
+from pathlib import Path
+
+def get_theme(mode: str) -> dict[str, str]:
+    """Return the requested colour theme."""
+    if mode not in {"dark", "light"}:
+        raise ValueError("mode must be either 'dark' or 'light'")
+
     if mode == "dark":
         return {
             "bg": "#030712",
@@ -79,35 +89,35 @@ def get_theme(mode):
         }
 
 
-ascii_lines = [
-    "  ________  ____  __   ___  ",
-    " /  _____/ /    |/  | /   \\ ",
-    "/   \\  ___|   __    |/ /^\\ \\",
-    "\\    \\_\\  \\  |  \\   /  ___  \\ ",
-    " \\______  /__|   \\__\\_/   \\__/",
-    "        \\/  VRLRAINA           ",
-    " ----------------------------  ",
-    " [ Full Stack  AI  DevOps ]   ",
-    " ----------------------------  ",
-    "  > React   > Node  > Python  ",
-    "  > Docker  > AWS   > TS      ",
-    " ----------------------------  ",
-    "  * Open Source Contributor   *",
-    "  * AI Interface Builder      *",
-    " ----------------------------  ",
-    "  [ github.com/vrlraina6-lang ]",
-]
+ascii_lines = r"""
+  ________  ____  __   ___
+ /  _____/ /    |/  | /   \
+/   \  ___|   __    |/ /^\ \
+\    \_\  \  |  \   /  ___  \
+ \______  /__|   \__\_/   \__/
+        \/  VRLRAINA E
+ ----------------------------
+ [ ECE | AI | IoT | Web ]
+ ----------------------------
+  > Python  > JavaScript > SQL
+  > ESP32   > AWS        > Git
+ ----------------------------
+  * AI and IoT Project Builder *
+  * Full-Stack Development     *
+ ----------------------------
+ [ github.com/vrlraina6-lang ]
+""".strip().splitlines()
 
 titles = [
-    "Full Stack Developer",
-    "Frontend Engineer",
-    "Open Source Contributor",
-    "UI/UX Engineer",
-    "AI Enthusiast",
+    "B.E. ECE Undergraduate",
+    "AI & IoT Project Builder",
+    "Python & Web Development Learner",
+    "Cloud Computing Enthusiast",
+    "UI/UX Design Enthusiast",
 ]
 
-skills_row1 = ["React", "Next.js", "Node.js", "TypeScript", "Tailwind"]
-skills_row2 = ["Python", "Docker", "Postgres", "AWS", "Git", "Figma"]
+skills_row1 = ["Python", "HTML", "CSS", "JavaScript", "React"]
+skills_row2 = ["PostgreSQL", "Git", "GitHub", "AWS", "Figma", "ESP32"]
 
 
 def iso_point(x, y, z, ox=210, oy=80, scale=22):
@@ -204,31 +214,31 @@ def make_orbiting_rings(cx, cy, t):
     <!-- Particle on ring 1 -->
     <circle r="4" fill="{t['accent2']}" opacity="0.9" filter="url(#glow_sm)">
         <animateMotion dur="12s" repeatCount="indefinite">
-            <mpath href="#ring_path1"/>
+            <mpath href="#ring_path1" xlink:href="#ring_path1"/>
         </animateMotion>
     </circle>
     <!-- Particle on ring 2 -->
     <circle r="3" fill="{t['accent1']}" opacity="0.8" filter="url(#glow_sm)">
         <animateMotion dur="9s" repeatCount="indefinite" begin="-3s">
-            <mpath href="#ring_path2"/>
+            <mpath href="#ring_path2" xlink:href="#ring_path2"/>
         </animateMotion>
     </circle>
     <!-- Particle on ring 3 -->
     <circle r="2.5" fill="{t['accent3']}" opacity="0.8" filter="url(#glow_sm)">
         <animateMotion dur="15s" repeatCount="indefinite" begin="-7s">
-            <mpath href="#ring_path3"/>
+            <mpath href="#ring_path3" xlink:href="#ring_path3"/>
         </animateMotion>
     </circle>'''
 
 
-def generate_svg(mode):
+def generate_svg(mode: str) -> str:
+    """Generate one animated SVG banner."""
     t = get_theme(mode)
 
     # Build ASCII lines SVG
     ascii_svg = ""
     for i, line in enumerate(ascii_lines):
-        escaped = (line.replace("&", "&amp;").replace("<", "&lt;")
-                      .replace(">", "&gt;").replace('"', "&quot;"))
+        escaped = escape(line, quote=True)
         y = 20 + i * 26
         delay = 0.3 + i * 0.1
         ascii_svg += f'''
@@ -242,6 +252,7 @@ def generate_svg(mode):
     pills1 = ""
     x = 0
     for i, skill in enumerate(skills_row1):
+        label = escape(skill, quote=True)
         w = len(skill) * 9 + 36
         delay = 3.5 + i * 0.12
         pills1 += f'''
@@ -249,7 +260,7 @@ def generate_svg(mode):
             <rect x="0" y="0" width="{w}" height="30" rx="15"
                   fill="{t['panel']}" stroke="url(#accent_grad)" stroke-width="1" opacity="0.6"/>
             <text x="{w/2}" y="20" font-family="system-ui,sans-serif" font-size="13"
-                  fill="{t['accent2']}" font-weight="600" text-anchor="middle">{skill}</text>
+                  fill="{t['accent2']}" font-weight="600" text-anchor="middle">{label}</text>
             <animate attributeName="opacity" values="0;1" dur="0.4s" begin="{delay}s" fill="freeze"/>
         </g>'''
         x += w + 10
@@ -258,6 +269,7 @@ def generate_svg(mode):
     pills2 = ""
     x = 0
     for i, skill in enumerate(skills_row2):
+        label = escape(skill, quote=True)
         w = len(skill) * 9 + 36
         delay = 4.2 + i * 0.12
         pills2 += f'''
@@ -265,62 +277,90 @@ def generate_svg(mode):
             <rect x="0" y="0" width="{w}" height="30" rx="15"
                   fill="{t['panel']}" stroke="url(#accent_grad)" stroke-width="1" opacity="0.6"/>
             <text x="{w/2}" y="20" font-family="system-ui,sans-serif" font-size="13"
-                  fill="{t['accent3']}" font-weight="600" text-anchor="middle">{skill}</text>
+                  fill="{t['accent3']}" font-weight="600" text-anchor="middle">{label}</text>
             <animate attributeName="opacity" values="0;1" dur="0.4s" begin="{delay}s" fill="freeze"/>
         </g>'''
         x += w + 10
 
-    # Typing animation — multiple title blocks
-    timeline = sum(len(tt) * 0.08 + 1.8 for tt in titles)
+    # Typing animation — synchronized and repeatable.
+    timeline = sum(len(item) * 0.08 + 1.8 for item in titles)
     typing_blocks = ""
-    cur = 0
+    current_time = 0.0
+
     for i, title in enumerate(titles):
-        t_len = len(title) * 0.08
-        t_hold = 1.5
-        t_out  = 0.3
-        total  = t_len + t_hold + t_out
-        s0 = cur / timeline
-        s1 = (cur + t_len) / timeline
-        s2 = (cur + t_len + t_hold) / timeline
-        s3 = (cur + total) / timeline
-        max_w = len(title) * 14
-        typing_blocks += f'''
+        typing_time = len(title) * 0.08
+        hold_time = 1.5
+        erase_time = 0.3
+        block_time = typing_time + hold_time + erase_time
+
+        start_ratio = current_time / timeline
+        typed_ratio = (current_time + typing_time) / timeline
+        hold_ratio = (current_time + typing_time + hold_time) / timeline
+        end_ratio = (current_time + block_time) / timeline
+        safe_start = max(start_ratio, 0.0001)
+        max_width = len(title) * 14
+        title_text = escape(title, quote=True)
+
+        if end_ratio < 0.9999:
+            width_values = f"0;0;{max_width};{max_width};0;0"
+            width_times = (
+                f"0;{safe_start:.4f};{typed_ratio:.4f};"
+                f"{hold_ratio:.4f};{end_ratio:.4f};1"
+            )
+            opacity_values = "0;1;1;0;0"
+            opacity_times = (
+                f"0;{safe_start:.4f};{hold_ratio:.4f};"
+                f"{end_ratio:.4f};1"
+            )
+        else:
+            width_values = f"0;0;{max_width};{max_width};0"
+            width_times = (
+                f"0;{safe_start:.4f};{typed_ratio:.4f};"
+                f"{hold_ratio:.4f};1"
+            )
+            opacity_values = "0;1;1;0"
+            opacity_times = f"0;{safe_start:.4f};{hold_ratio:.4f};1"
+
+        typing_blocks += f"""
         <g opacity="0">
             <clipPath id="tc{i}">
                 <rect x="0" y="-22" width="0" height="28">
-                    <animate attributeName="width" from="0" to="{max_w}" dur="{t_len}s"
-                        begin="{cur}s" fill="freeze" repeatCount="1"/>
-                    <animate attributeName="width" from="{max_w}" to="{max_w}" dur="{t_hold}s"
-                        begin="{cur+t_len}s" fill="freeze" repeatCount="1"/>
-                    <animate attributeName="width" from="{max_w}" to="0" dur="{t_out}s"
-                        begin="{cur+t_len+t_hold}s" fill="freeze" repeatCount="1"/>
+                    <animate attributeName="width"
+                        values="{width_values}"
+                        keyTimes="{width_times}"
+                        dur="{timeline:.1f}s"
+                        repeatCount="indefinite"/>
                 </rect>
             </clipPath>
-            <text x="0" y="0" font-family="monospace" font-size="19" font-weight="700"
-                  fill="url(#accent_grad)" clip-path="url(#tc{i})">{title}</text>
-            <animate attributeName="opacity" values="0;1;1;0;0"
-                keyTimes="0;{max(0.001,s0):.4f};{s2:.4f};{s3:.4f};1"
-                dur="{timeline:.1f}s" repeatCount="indefinite"/>
-        </g>'''
-        cur += total
+            <text x="0" y="0" font-family="monospace" font-size="19"
+                  font-weight="700" fill="url(#accent_grad)"
+                  clip-path="url(#tc{i})">{title_text}</text>
+            <animate attributeName="opacity"
+                values="{opacity_values}"
+                keyTimes="{opacity_times}"
+                dur="{timeline:.1f}s"
+                repeatCount="indefinite"/>
+        </g>"""
+        current_time += block_time
 
     # Info items
     info = [
-        ("📍", t["accent1"], "San Francisco, CA"),
-        ("🎓", t["accent2"], "B.S. in Computer Science"),
-        ("🚀", t["accent3"], "Building next-gen AI interfaces"),
+        ("📍", t["accent1"], "Erode, Tamil Nadu, India"),
+        ("🎓", t["accent2"], "B.E. Electronics & Communication Engineering"),
+        ("🚀", t["accent3"], "Building AI, IoT & Full-Stack Projects"),
         ("🔗", t["accent1"], "github.com/vrlraina6-lang"),
-        ("✉️", t["accent2"], "hello@vrlraina.dev"),
+        ("✉️", t["accent2"], "vrlraina6@gmail.com"),
     ]
     info_svg = ""
     for i, (icon, color, text) in enumerate(info):
         delay = 2.2 + i * 0.3
         y = i * 38
+        safe_text = escape(text, quote=True)
         info_svg += f'''
         <g opacity="0" transform="translate(0,{y})">
             <text x="0" y="0" font-size="16">{icon}</text>
             <text x="32" y="0" font-family="system-ui,sans-serif" font-size="15"
-                  font-weight="500" fill="{t['muted']}">{text}</text>
+                  font-weight="500" fill="{t['muted']}">{safe_text}</text>
             <animate attributeName="opacity" values="0;1" dur="0.5s" begin="{delay}s" fill="freeze"/>
             <animateTransform attributeName="transform" type="translate"
                 values="0,{y+8};0,{y}" dur="0.5s" begin="{delay}s" fill="freeze"/>
@@ -358,8 +398,12 @@ def generate_svg(mode):
         </circle>'''
 
     svg = f'''<svg width="1180" height="610" viewBox="0 0 1180 610"
+     preserveAspectRatio="xMidYMid meet"
+     role="img" aria-labelledby="banner-title banner-description"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title id="banner-title">VRLRAINA E — GitHub profile banner</title>
+  <desc id="banner-description">Animated profile banner for an ECE undergraduate building AI, IoT and web projects.</desc>
 
   <defs>
     <!-- Gradients -->
@@ -580,7 +624,7 @@ def generate_svg(mode):
         <circle cx="44" cy="22" r="6" fill="#EAB308" opacity="0.9"/>
         <circle cx="66" cy="22" r="6" fill="#22C55E" opacity="0.9"/>
         <text x="88" y="27" font-family="monospace" font-size="11" fill="{t['muted']}"
-              opacity="0.6">bash — vrlraina6-lang</text>
+              opacity="0.6">terminal — vrlraina6-lang</text>
 
         <!-- Divider -->
         <line x1="15" y1="40" x2="405" y2="40" stroke="{t['border']}" stroke-width="1"/>
@@ -637,7 +681,7 @@ def generate_svg(mode):
         <circle cx="44" cy="22" r="6" fill="#EAB308" opacity="0.9"/>
         <circle cx="66" cy="22" r="6" fill="#22C55E" opacity="0.9"/>
         <text x="88" y="27" font-family="monospace" font-size="11" fill="{t['muted']}"
-              opacity="0.6">profile.tsx — developer</text>
+              opacity="0.6">profile.py — vrlraina</text>
 
         <!-- Divider -->
         <line x1="15" y1="40" x2="685" y2="40" stroke="{t['border']}" stroke-width="1"/>
@@ -656,19 +700,19 @@ def generate_svg(mode):
           <!-- Shadow/extrude layers -->
           <text x="3" y="60" font-family="system-ui,sans-serif" font-size="52"
                 font-weight="800" fill="{t['extrude']}" opacity="0" letter-spacing="-1">
-            I'm VRLRAINA
+            I'm VRLRAINA E
             <animate attributeName="opacity" values="0;0.6" dur="0.5s" begin="0.8s" fill="freeze"/>
           </text>
           <text x="2" y="59" font-family="system-ui,sans-serif" font-size="52"
                 font-weight="800" fill="{t['extrude']}" opacity="0" letter-spacing="-1">
-            I'm VRLRAINA
+            I'm VRLRAINA E
             <animate attributeName="opacity" values="0;0.4" dur="0.5s" begin="0.8s" fill="freeze"/>
           </text>
           <!-- Main name with gradient -->
           <text x="0" y="57" font-family="system-ui,sans-serif" font-size="52"
                 font-weight="800" fill="url(#accent_grad)" opacity="0"
                 letter-spacing="-1" filter="url(#glow_sm)">
-            I'm VRLRAINA
+            I'm VRLRAINA E
             <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.8s" fill="freeze"/>
           </text>
 
@@ -785,11 +829,38 @@ def generate_svg(mode):
     return svg
 
 
-if __name__ == "__main__":
-    for mode in ("dark", "light"):
+def main() -> int:
+    """Generate dark and/or light SVG files."""
+    parser = argparse.ArgumentParser(
+        description="Generate VRLRAINA E GitHub profile banner SVG files."
+    )
+    parser.add_argument(
+        "--mode",
+        choices=("dark", "light", "both"),
+        default="both",
+        help="Theme to generate. Default: both.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path(__file__).resolve().parent / "generated",
+        help="Directory where SVG files will be written.",
+    )
+    args = parser.parse_args()
+
+    output_dir: Path = args.output_dir.expanduser().resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    modes = ("dark", "light") if args.mode == "both" else (args.mode,)
+    for mode in modes:
         svg = generate_svg(mode)
-        path = f"C:\\Users\\user\\.gemini\\antigravity\\scratch\\github-banner\\{mode}.svg"
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(svg)
-        print(f"[OK] {mode}.svg generated ({len(svg)//1024}KB)")
-    print("[DONE] All done!")
+        output_path = output_dir / f"vrlraina-profile-{mode}.svg"
+        output_path.write_text(svg, encoding="utf-8")
+        print(f"[OK] {output_path} ({len(svg) // 1024} KB)")
+
+    print("[DONE] Banner generation completed.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
